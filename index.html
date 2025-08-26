@@ -5,23 +5,29 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChaloDriver – Your Driver On-Demand</title>
-  <meta name="description" content="Book a professional car driver for hours, daily, or outstation trips. Reliable, affordable, and available 24/7. Car Driver on Demand in Hindi-speaking states of India." />
-  <meta name="keywords" content="Driver on demand, Car driver India, Hire driver Delhi, Hire driver Jaipur, Ghar ka driver, Private driver service, Car driver booking, आउटस्टेशन ड्राइवर, ड्राइवर किराए पर, Taxi driver service, Driver service UP, Driver service Bihar, Driver service Rajasthan, Driver service MP, Driver service Haryana, Driver service Jharkhand" />
+  <meta name="description"
+    content="Book a professional car driver for hours, daily, or outstation trips. Reliable, affordable, and available 24/7. Car Driver on Demand in Hindi-speaking states of India." />
+  <meta name="keywords"
+    content="Driver on demand, Car driver India, Hire driver Delhi, Hire driver Jaipur, Ghar ka driver, Private driver service, Car driver booking, आउटस्टेशन ड्राइवर, ड्राइवर किराए पर, Taxi driver service, Driver service UP, Driver service Bihar, Driver service Rajasthan, Driver service MP, Driver service Haryana, Driver service Jharkhand" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
-  
+  <link rel="canonical" href="https://www.chalodriver.in/" />
+
+
   <!-- Geo Targeting -->
   <meta name="geo.region" content="IN">
   <meta name="geo.placename" content="India">
   <meta name="geo.position" content="20.5937;78.9629">
   <meta name="ICBM" content="20.5937, 78.9629">
 
-   <!-- Language Targeting -->
+  <!-- Language Targeting -->
   <meta http-equiv="content-language" content="hi,en">
 
-    <!-- Open Graph / Facebook -->
+
+
+  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.chalodriver.in/">
   <meta property="og:title" content="Hire Professional Car Drivers in India – ChaloDriver">
@@ -644,23 +650,54 @@
   </script>
 
   <script>
-    document.getElementById("bookingForm").addEventListener("submit", function (e) {
-      e.preventDefault();
+    (function () {
+      const bookingForm = document.getElementById("bookingForm");
+      const whatsappNumber = "919977465250"; // your WhatsApp number (no +, no spaces)
+      const appsScriptUrl = "https://script.google.com/macros/s/AKfycbyedfrMT_Y7_1AOPoF0CWsb6rx8WAbaUBpLb6xczHe8EInfY5QbWZDwElkOPAdM1cMuag/exec"; // paste your Web App URL here
 
-      // Collect form data
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-      const email = document.getElementById("email").value || "N/A";
-      const pickup = document.getElementById("pickup").value;
-      const datetime = document.getElementById("datetime").value;
-      const service = document.getElementById("service").value;
-      const notes = document.getElementById("notes").value || "N/A";
+      // ✅ Success notification bar
+      function showSuccess(message) {
+        let bar = document.getElementById("successBar");
+        if (!bar) {
+          bar = document.createElement("div");
+          bar.id = "successBar";
+          bar.style.position = "fixed";
+          bar.style.top = "20px";
+          bar.style.left = "50%";
+          bar.style.transform = "translateX(-50%)";
+          bar.style.background = "#28a745";
+          bar.style.color = "white";
+          bar.style.padding = "12px 20px";
+          bar.style.borderRadius = "8px";
+          bar.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+          bar.style.zIndex = "9999";
+          bar.style.fontSize = "15px";
+          document.body.appendChild(bar);
+        }
+        bar.textContent = message;
+        bar.style.display = "block";
+        setTimeout(() => { bar.style.display = "none"; }, 3000);
+      }
 
-      // WhatsApp number
-      const whatsappNumber = "919977465250"; // Without + and spaces
+      bookingForm.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-      // Create message
-      const message = `📌 New Driver Request
+        if (!bookingForm.checkValidity()) {
+          bookingForm.classList.add("was-validated");
+          return;
+        }
+
+        // Collect form data
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const email = document.getElementById("email").value.trim() || "N/A";
+        const pickup = document.getElementById("pickup").value.trim();
+        const datetime = document.getElementById("datetime").value;
+        const service = document.getElementById("service").value;
+        const notes = document.getElementById("notes").value.trim() || "N/A";
+
+        // WhatsApp message
+        const message = `📌 New Driver Request
 -------------------------
 👤 Name: ${name}
 📞 Phone: ${phone}
@@ -670,13 +707,32 @@
 🚗 Service: ${service}
 📝 Notes: ${notes}`;
 
-      // Encode message for URL
-      const encodedMessage = encodeURIComponent(message);
+        // Open WhatsApp
+        window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
 
-      // Open WhatsApp
-      window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, "_blank");
-    });
+        // Prepare query string for GET request
+        const params = new URLSearchParams({
+          name, phone, email, pickup, datetime, service, notes
+        });
+
+        // Save to Google Sheet
+        fetch(`${appsScriptUrl}?${params.toString()}`)
+          .then(res => res.json())
+          .then(() => {
+            showSuccess("✅ Your request has been successfully sent!");
+            bookingForm.reset(); // clear form
+            bookingForm.classList.remove("was-validated");
+          })
+          .catch(() => {
+            showSuccess("✅ Request sent (WhatsApp ok, Google Sheet failed).");
+            bookingForm.reset();
+            bookingForm.classList.remove("was-validated");
+          });
+      });
+    })();
   </script>
+
+
 
   <script>
     document.getElementById("calcForm").addEventListener("submit", function (e) {
